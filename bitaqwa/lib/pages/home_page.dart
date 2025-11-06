@@ -1,10 +1,30 @@
+import 'dart:async'; //timer countdown
 import 'package:flutter/material.dart';
+import 'package:carousel_slider/carousel_slider.dart'; // carosel slider
+import 'package:http/http.dart' as http; // ambil data API
+import 'dart:convert'; // decode JSON
+import 'package:geolocator/geolocator.dart'; // GPS
+import 'package:geocoding/geocoding.dart'; // Konversi GPS
+import 'package:intl/intl.dart'; // Formatter Number
+import 'package:permission_handler/permission_handler.dart'; // Izin handler
+import 'package:shared_preferences/shared_preferences.dart'; // cache lokal
+import 'package:string_similarity/string_similarity.dart'; // fuzzy match string
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
-  final posterList = const <String> [
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
 
+class _HomePageState extends State<HomePage> {
+  final CarouselController _controller = CarouselController();
+  int _curentIndex = 0;
+
+  final posterList = const <String>[
+    'assets/images/ramadhan-karrem.png',
+    'assets/images/idl-fitr.png',
+    'assets/images/idl-adh.png',
   ];
 
   @override
@@ -76,7 +96,9 @@ class HomePage extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: <Widget>[
-                                Image.asset('assets/images/ic_menu_jadwal_sholat.png'),
+                                Image.asset(
+                                  'assets/images/ic_menu_jadwal_sholat.png',
+                                ),
                                 Text(
                                   'Jadwal Sholat',
                                   style: TextStyle(
@@ -97,7 +119,9 @@ class HomePage extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: <Widget>[
-                                Image.asset('assets/images/ic_menu_video_kajian.png'),
+                                Image.asset(
+                                  'assets/images/ic_menu_video_kajian.png',
+                                ),
                                 Text(
                                   'Video Kajian',
                                   style: TextStyle(
@@ -115,9 +139,32 @@ class HomePage extends StatelessWidget {
                 ),
               ),
             ),
+
+            // =======================
+            // Carousel Section
+            // =======================
+            _buildCarouselSection(),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildCarouselSection() {
+    return Column(
+      children: [
+        const SizedBox(height: 20),
+        CarouselSlider.builder(
+          itemCount: posterList.length,
+          itemBuilder: (contex, index, realIndex){
+            final poster = posterList[index];
+            return Container(
+              child: Image.asset(poster),
+            );
+          },
+          options: CarouselOptions(),
+        ),
+      ],
     );
   }
 }
