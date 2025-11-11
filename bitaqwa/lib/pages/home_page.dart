@@ -20,12 +20,41 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final CarouselController _controller = CarouselController();
   int _currentIndex = 0;
+  bool _isLoading = true;
+  Duration? _timeRemaining;
+  Timer? _countdownTimer;
+  String _location = "Mengambil Lokasi....";
+  String _prayTime = "Loading...";
+  String _backgroundImage = 'assets/images/bg-morning.png';
+  List<dynamic>? _jadwalSholat;
+
+  //state untuk di jalankan diawal
+  @override
+  void initState() {
+    super.initState();
+  }
 
   final posterList = const <String>[
     'assets/images/ramadhan-karrem.png',
     'assets/images/idl-fitr.png',
     'assets/images/idl-adh.png',
   ];
+
+  //fungsi teks remaining waktu sholat
+  String _formatDuration(Duration d) {
+    final hours = d.inHours;
+    final minute = d.inMinutes.remainder(60);
+    return "$hours jam $minute menit lagi";
+  }
+
+  String _getBackgroundImage(DateTime now) async {
+    if (now.hour < 12) {
+      return 'assets/images/bg_morning.png';
+    } else if (now.hour < 18){
+      return 'assets/images/bg-afternoon.png';
+    }
+    
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +67,7 @@ class _HomePageState extends State<HomePage> {
               // Menu waktu sholat by lokasi
               // ============================================
               _buildHeroSection(),
+              SizedBox(height: 70,),
               // ============================================
               // Menu Section
               // ============================================
@@ -69,7 +99,7 @@ class _HomePageState extends State<HomePage> {
               bottomLeft: Radius.circular(30),
               bottomRight: Radius.circular(30),
               ),
-              image: DecorationImage(image: AssetImage('assets/images/bg-afternoon.png'),
+              image: DecorationImage(image: AssetImage('assets/images/bg-night.png'),
               fit: BoxFit.cover,
               ),
           ),
@@ -103,10 +133,72 @@ class _HomePageState extends State<HomePage> {
                     color: Colors.white
                   ),
                 ),
+                
               ],
             ),
           ),
         ),
+
+        // ========= WAKTU SHOLAT SELANJUTNYA ===========
+        Positioned(
+          bottom: -55,
+          left: 20,
+          right: 20,
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(255, 255, 255, 255),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 2,
+                  offset: Offset(0, 4),
+                  color: Colors.black.withOpacity(0.4),
+                )
+              ]
+            ),
+            padding: EdgeInsets.symmetric(
+              vertical: 16,
+              horizontal: 14,
+            ),
+            child: Column(
+              children: [
+                Text(
+                  'Waktu Sholat Berikutnya',
+                  style: TextStyle(
+                    fontFamily: 'Montserrat-Regular',
+                    fontSize: 14,
+                    color: Colors.black
+                  ),
+                ),
+                Text(
+                  'ASHAR',
+                  style: TextStyle(
+                    fontFamily: 'Montserrat-Bold',
+                    fontSize: 20,
+                    color: Colors.amber
+                  ),
+                ),
+                Text(
+                  '14:22',
+                  style: TextStyle(
+                    fontFamily: 'Montserrat-Bold',
+                    fontSize: 28,
+                    color: Colors.black26
+                  ),
+                ),
+                Text(
+                  '5 Jam 10 Menit',
+                  style: TextStyle(
+                    fontFamily: 'Montserrat-Regular',
+                    fontSize: 13,
+                    color: Colors.grey
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+
       ],
     );
   }
@@ -149,7 +241,7 @@ class _HomePageState extends State<HomePage> {
   // =====================================================
   Widget _buildMenuGridSection() {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: EdgeInsets.all(8.0),
       child: GridView.count(
         crossAxisCount: 4,
         shrinkWrap: true,
