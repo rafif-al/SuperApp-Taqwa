@@ -1,9 +1,34 @@
-import 'package:bitaqwa/pages/home_page.dart';
-import 'package:flutter/material.dart';
+import 'dart:io';
 
-void main() {
+import 'package:bitaqwa/pages/doa_pages.dart';
+import 'package:bitaqwa/pages/home_page.dart';
+import 'package:bitaqwa/pages/kajian_page.dart';
+import 'package:bitaqwa/pages/sholat_page.dart';
+import 'package:bitaqwa/pages/zakat_pages.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
+
+void main() async {
+  /// 🔹 Pastikan Flutter sudah siap sebelum menjalankan async
   WidgetsFlutterBinding.ensureInitialized();
+ 
+  /// 🔹 Inisialisasi format tanggal bahasa Indonesia
+  /// Contoh hasil: “Senin, 6 November 2025”
+  await initializeDateFormatting('id_ID', null);
+ 
+  /// 🔹 Override SSL supaya koneksi HTTP/HTTPS yang self-signed tetap bisa jalan
+  HttpOverrides.global = MyHttpOverrides();
+ 
+  /// 🔹 Jalankan aplikasi utama
   runApp(const MyApp());
+}
+ 
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (cert, host, port) => true;
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -19,6 +44,10 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       routes: {
         '/': (context) => HomePage(),
+        '/doa-harian' :  (context) => DoaPage(),
+        '/zakat-page' :  (context) => ZakatPage(),
+        '/jadwal-sholat' :  (context) => SholatPage(),
+        '/video-kajian' :  (context) => KajianPage(),
       }
     );
   }
